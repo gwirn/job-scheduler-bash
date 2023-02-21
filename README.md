@@ -13,7 +13,7 @@ This does the following steps:
 *  creates a folder `$HOME/.scheduler` where the script and error messages will be stored
    * in there a folder `errorlog` will be created at the first time running
    * in this folder errors happening during run with this scheduler will be stored in `error.log`
-*  copies the `scheduler.sh` to this folder
+*  copies the `schedule.sh` to this folder
 *  creates an alias in your `$HOME/.bashrc` file
    *  you then can run anything you want with `jsb "YOURCOMMAND"`
    *  note that `"` are essential
