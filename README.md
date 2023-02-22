@@ -32,6 +32,6 @@ This executes the following steps:
    * sample commands: 
       * `jsb "python3 long_running.py"`
       * `jsb "bash bigbashscript.sh"`
-  * can be run with nohup like:
+   * can be run with nohup like:
       * `nohup jsb "./expensivetask" &`
     
