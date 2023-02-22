@@ -34,4 +34,5 @@ This executes the following steps:
       * `jsb "bash bigbashscript.sh"`
    * can be run with nohup like:
       * `nohup jsb "./expensivetask" &`
-    
+## Usage example
+For two given programs `bigprogram_a.py` and `bigprogram_b.py` one can open two consoles and run `jsb "python3 bigprogram_a.py"` and in the second one run `jsb "python3 bigprogram_b.py`. This will run `bigprogram_a.py` and test every minute whether `bigprogram_a.py` is still running. If not it starts `bigprogram_b.py` or if it's still running it tests again in one minute. The same can be done with `nohup` as described above. 
