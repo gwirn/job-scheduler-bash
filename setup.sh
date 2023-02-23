@@ -14,8 +14,7 @@ if [ ! -e "/var/pid_storage/pid_store.txt" ]; then
     echo "run following commands:"
     echo "sudo touch /var/pid_storage/pid_store.txt"
     echo "sudo chown YOURNAME /var/pid_storage/pid_store.txt"
-    echo "chmod o+rx /var/pid_storage/pid_store.txt"
-    echo "chmod +rx /var/pid_storage/pid_store.txt"
+    echo "chmod o+rw /var/pid_storage/pid_store.txt"
 fi
 
 if [ ! -d "$HOME/.scheduler" ]; then
