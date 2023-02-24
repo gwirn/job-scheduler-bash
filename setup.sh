@@ -33,6 +33,12 @@ if ! grep -q "$ALIAS" "$HOME/.bashrc"; then
     echo "Scheduler added as 'jsb' alias in your $HOME/.bashrc"
 fi
 
+NALIAS='alias njsb="nohup bash $HOME/.scheduler/schedule.sh"' 
+if ! grep -q "$NALIAS" "$HOME/.bashrc"; then
+    echo $NALIAS >> "$HOME/.bashrc"
+    echo "Scheduler added as 'njsb' alias in your $HOME/.bashrc"
+fi
+
 if [[ "$cmdneed" -eq 1 ]]; then
     echo "Everything is set after executing the commands above - you can remove this folder if you want"
 else
