@@ -36,4 +36,6 @@ if ! grep -q "$NALIAS" "$HOME/.bashrc"; then
     echo "Scheduler added as 'njsb' alias in your $HOME/.bashrc"
 fi
 
+type nohup || echo "nohup is not installed - please install it to be able to use 'njsb'"
+
 echo "Everything is set - you can remove this folder if you want"
