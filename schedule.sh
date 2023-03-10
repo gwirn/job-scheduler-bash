@@ -55,14 +55,14 @@ go=0
 while [[ "$go" -eq "0" ]]; do
     # check if I am the oldest running PID
     if ! monitor_pids; then
-        echo "--- Machine is busy - next try in ${sleeping_min} minute(s) ---"
+        echo "--- $(date +%Y-%m-%d-%H-%M-%S) Machine is busy - next try in ${sleeping_min} minute(s) ---"
         sleep $(( $sleeping_min * 60 ))
     else
         let go=1
     fi
 done
 
-echo "*** Nothing is running - ready to take of ***"
+echo "*** Now we are free - ready to take of ***"
 
 # saving errors - dir creation and date saving
 if  [ ! -d "$errordir" ]; then
