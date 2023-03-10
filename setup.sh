@@ -1,20 +1,17 @@
 #!/bin/bash
 
-cmdneed=0
 if [ ! -d "/var/pid_storage/" ]; then
-    cmdneed=1
     echo "pid_storage is missing"
-    echo "run following command:"
-    echo "sudo mkdir /var/pid_storage/"
+    echo "creating directory /var/pid_storage/"
+    sudo mkdir /var/pid_storage/
 fi
 
 if [ ! -e "/var/pid_storage/pid_store.txt" ]; then
-    cmdneed=1
     echo "pid_store.txt is missing"
-    echo "run following commands:"
-    echo "sudo touch /var/pid_storage/pid_store.txt"
-    echo "sudo chown YOURNAME /var/pid_storage/pid_store.txt"
-    echo "chmod o+rw /var/pid_storage/pid_store.txt"
+    echo "creating file, changing ownership and permissions"
+    sudo touch /var/pid_storage/pid_store.txt
+    sudo chown $(whoami) /var/pid_storage/pid_store.txt
+    chmod o+rw /var/pid_storage/pid_store.txt
 fi
 
 if [ ! -d "$HOME/.scheduler" ]; then
@@ -39,8 +36,4 @@ if ! grep -q "$NALIAS" "$HOME/.bashrc"; then
     echo "Scheduler added as 'njsb' alias in your $HOME/.bashrc"
 fi
 
-if [[ "$cmdneed" -eq 1 ]]; then
-    echo "Everything is set after executing the commands above - you can remove this folder if you want"
-else
-    echo "Everything is set - you can remove this folder if you want"
-fi
+echo "Everything is set - you can remove this folder if you want"
