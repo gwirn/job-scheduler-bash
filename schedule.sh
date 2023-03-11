@@ -8,6 +8,13 @@ tmpplace='/tmp/tmppid/'
 errordir="$HOME/.scheduler/errorlog"
 echo "$mypid" >> "$pidplace"
 
+function avoid_change (){
+    # avoid changing the pid storage file when it is currently processed
+    while [ -n "$(lsof "$pidplace")" ]; do
+        sleep 0.5
+    done
+}
+
 function monitor_pids (){
     # true if nothing is running
     check=0
@@ -35,6 +42,7 @@ function monitor_pids (){
     if (( "$incr" > 0 )) && [[ "$check" -eq "0" ]]; then
         echo "*** Removing stored but crashed PIDs ***"
         tmppid="${tmpplace}${mypid}"
+        avoid_change
         sed $crashedpid $pidplace > "$tmppid"
         cat "$tmppid" > "$pidplace"
     fi
@@ -92,6 +100,7 @@ rm "${tmpplace}e${mypid}"
 
 # removes my PID from storage file
 echo "*** Removing myself from running PIDs ***"
+avoid_change
 awk "!/$mypid/" $pidplace > "${tmpplace}r${mypid}"
 cat "${tmpplace}r${mypid}" > "$pidplace"
 rm "$tmpplace"*
