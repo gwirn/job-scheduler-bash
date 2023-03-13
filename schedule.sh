@@ -3,22 +3,87 @@ sleeping_min=1
 
 # store the bash script pid 
 mypid=$$
-pidplace='/var/pid_storage/pid_store.txt'
+pidplace="/var/pid_storage/pid_store.txt"
 tmpplace='/tmp/tmppid/'
 errordir="$HOME/.scheduler/errorlog"
+lockfile="${tmpplace}pid.lock"
 echo "$mypid" >> "$pidplace"
 
-function avoid_change (){
-    # avoid changing the pid storage file when it is currently processed
-    while [ -n "$(lsof "$pidplace")" ]; do
+function genlock (){
+    # create lock file so pid storage doesn't get changed when used by other process
+    echo "$mypid" > "$lockfile"
+ }
+
+function rmlock (){
+    # remove lock file and return 0 if file was removed or 1 if file was alread gone
+    if [ -f "$lockfile" ]; then
+        rm "$lockfile"
+        return 0
+    else
+        return 1
+    fi
+ }
+
+function checklock (){
+    # check if PID in lockfile is still alive
+    if [ -f "$lockfile" ]; then
+        lockpid=$(cat "$lockfile") 
+        # if its not myself
+        if [ ! "$lockpid" == "$mypid" ] && [ -n "$lockpid" ];then
+            # if lock PID is dead
+            if ! ps -p "$lockpid" > /dev/null;then
+                rmlock
+                rml_ret="$?"
+                if [[ "$rml_ret" -eq "0" ]];then
+                    echo "*** Removed crashed pid lock ***"
+                fi
+            fi
+            
+        fi
+    fi
+
+    # check if valid lockfile exists and if so then wait
+    while [ -f "$lockfile" ]; do
         sleep 0.5
     done
+ }
+
+function cleanup (){
+    SIGNAL=$1
+    echo "xxx CLEANUP xxx"
+
+    # removes my PID from storage file
+    echo "*** Removing myself from running PIDs ***"
+    checklock
+    genlock
+    awk "!/$mypid/" $pidplace > "${tmpplace}r${mypid}"
+    cat "${tmpplace}r${mypid}" > "$pidplace"
+    rmlock
+
+    if [ -f "${tmpplace}e${mypid}" ];then
+        rm "${tmpplace}e${mypid}"
+    fi
+
+    if [ -f "${tmpplace}r${mypid}" ];then
+        rm "${tmpplace}r${mypid}"
+    fi
+
+    if [ -f "${tmpplace}${mypid}" ];then
+        rm "${tmpplace}${mypid}"
+    fi
+
+    if [ -n "$SIGNAL" ]; then
+        trap $SIGNAL
+        kill -${SIGNAL} $$
+    fi
 }
 
 function monitor_pids (){
     # true if nothing is running
     check=0
     incr=0
+    checklock
+    genlock
     # read the file with stored PIDs
     while IFS= read -r saved_pids; do
         # check if PID in file is still running
@@ -42,16 +107,18 @@ function monitor_pids (){
     if (( "$incr" > 0 )) && [[ "$check" -eq "0" ]]; then
         echo "*** Removing stored but crashed PIDs ***"
         tmppid="${tmpplace}${mypid}"
-        avoid_change
         sed $crashedpid $pidplace > "$tmppid"
         cat "$tmppid" > "$pidplace"
     fi
+    rmlock
     return $check
 }
 
 if [ ! -d "/tmp/tmppid" ]; then
     mkdir "$tmpplace"
 fi
+
+trap cleanup EXIT
 
 # check queued jobs
 file_start=$(head -n 1 $pidplace)
@@ -96,11 +163,3 @@ fi
 # keeping only the last 1000 lines of error messages
 tail -n 1000 "$errlogfile" > "${tmpplace}e${mypid}"
 cat "${tmpplace}e${mypid}" > "$errlogfile" 
-rm "${tmpplace}e${mypid}"
-
-# removes my PID from storage file
-echo "*** Removing myself from running PIDs ***"
-avoid_change
-awk "!/$mypid/" $pidplace > "${tmpplace}r${mypid}"
-cat "${tmpplace}r${mypid}" > "$pidplace"
-rm "$tmpplace"*
