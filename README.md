@@ -18,6 +18,7 @@ It can be used with one or multiple users. Each user uses the same internal queu
 
 ## Setup 
 In order to set everything run `bash setup.sh`
+By default the `pid_storage` file will be stored in `/var/pid_storage`. This can be changed by running the setup like `bash setup.sh "PATH/TO/STORAGE/DIRECTORY"'`.
 
 This executes the following steps:
 *  checks for the `/var/pid_storage` directory and shows the command needed to create it if it's not present

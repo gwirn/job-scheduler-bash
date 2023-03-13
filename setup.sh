@@ -1,17 +1,31 @@
 #!/bin/bash
 
-if [ ! -d "/var/pid_storage/" ]; then
-    echo "pid_storage is missing"
-    echo "creating directory /var/pid_storage/"
-    sudo mkdir /var/pid_storage/
+storage_path="$1"
+
+if [ ! -z "$storage_path" ];then
+    path_end="${storage_path: -1}"
+    if [ ! "$path_end" == "/" ];then
+        storage_path="${storage_path}/"
+    fi
+    tmpfile=$(mktemp ./tempfile.XXXXXX)
+    sed "s+/var/pid_storage/+${storage_path}+" schedule.sh > $tmpfile ; rm schedule.sh ; mv $tmpfile schedule.sh
+    chmod +rx schedule.sh
+else
+    storage_path="/var/pid_storage/"
 fi
 
-if [ ! -e "/var/pid_storage/pid_store.txt" ]; then
+if [ ! -d "$storage_path" ]; then
+    echo "pid_storage is missing"
+    echo "creating directory ${storage_path}"
+    sudo mkdir "$storage_path"
+fi
+
+if [ ! -e "${storage_path}pid_store.txt" ]; then
     echo "pid_store.txt is missing"
     echo "creating file, changing ownership and permissions"
-    sudo touch /var/pid_storage/pid_store.txt
-    sudo chown $(whoami) /var/pid_storage/pid_store.txt
-    chmod o+rw /var/pid_storage/pid_store.txt
+    sudo touch "${storage_path}pid_store.txt"
+    sudo chown $(whoami) "${storage_path}pid_store.txt"
+    chmod o+rw "${storage_path}pid_store.txt"
 fi
 
 if [ ! -d "$HOME/.scheduler" ]; then
