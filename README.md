@@ -17,7 +17,8 @@ It can be used with one or multiple users. Each user uses the same internal queu
   * only the last 1000 lines of error messages are stored
 
 ## Setup 
-In order to set everything run `bash setup.sh`
+In order to set everything run `bash setup.sh` from within this directory.
+
 By default the `pid_storage` file will be stored in `/var/pid_storage`. This can be changed by running the setup like `bash setup.sh "PATH/TO/STORAGE/DIRECTORY"'`.
 
 This executes the following steps:
