@@ -17,14 +17,29 @@ fi
 if [ ! -d "$storage_path" ]; then
     echo "pid_storage is missing"
     echo "creating directory ${storage_path}"
-    sudo mkdir "$storage_path"
+    mkdir "$storage_path"
+    mkd_ret=$?
+    if [ "mkd_ret" == "1" ]; then
+        echo "Using sudo to create $storage_path"
+        sudo mkdir "$storage_path"
+    fi
 fi
 
 if [ ! -e "${storage_path}pid_store.txt" ]; then
     echo "pid_store.txt is missing"
     echo "creating file, changing ownership and permissions"
-    sudo touch "${storage_path}pid_store.txt"
-    sudo chown $(whoami) "${storage_path}pid_store.txt"
+    touch "${storage_path}pid_store.txt"
+    t_ret="$?"
+    if [ "$t_ret" == "1" ]; then
+        echo "Using sudo to create ${storage_path}pid_store.txt"
+        sudo touch "${storage_path}pid_store.txt"
+    fi
+    chown $(whoami) "${storage_path}pid_store.txt"
+    c_ret="$?"
+    if [ "$c_ret" == "1" ]; then
+        echo "Using sudo to change ownership of ${storage_path}pid_store.txt"
+        sudo chown $(whoami) "${storage_path}pid_store.txt"
+    fi
     chmod o+rw "${storage_path}pid_store.txt"
 fi
 
