@@ -72,10 +72,8 @@ function cleanup (){
         rm "${tmpplace}${mypid}"
     fi
 
-    if [ -n "$SIGNAL" ]; then
-        trap $SIGNAL
-        kill -${SIGNAL} $$
-    fi
+    trap - EXIT INT TERM
+    kill -- -$$
 }
 
 function monitor_pids (){
@@ -118,7 +116,7 @@ if [ ! -d "/tmp/tmppid" ]; then
     mkdir "$tmpplace"
 fi
 
-trap cleanup EXIT
+trap cleanup EXIT INT TERM
 
 # check queued jobs
 file_start=$(head -n 1 $pidplace)
